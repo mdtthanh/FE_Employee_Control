@@ -14,6 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import { mainListItems } from './listItems';
 import SimpleTable from './SimpleTable';
+          import { Button } from '@material-ui/core';
 
 const drawerWidth = 240;
 
@@ -161,10 +162,7 @@ class Dashboard extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Typography variant="h4" gutterBottom component="h2">
-            Orders
-          </Typography>
-          <Typography variant="h4" gutterBottom component="h2">
-            Products
+            Employee
           </Typography>
           <div className={classes.tableContainer}>
             <SimpleTable />
