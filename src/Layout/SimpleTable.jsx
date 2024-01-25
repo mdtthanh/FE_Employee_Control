@@ -341,18 +341,10 @@ function SimpleTable(props) {
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Typography sx={{ fontSize: "18px" }}>
-                                            {/* {n.workTime} */}
-                                            {/* {year} {month} {day} */}
-
-                                            {year}年{padTo2DigitsTime(month)}月{padTo2DigitsTime(day)}  {padTo2DigitsTime(hours)}:{padTo2DigitsTime(minutes)}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="center">
                                         <Chip
                                             sx={{
                                                 width: "100px",
-                                                backgroundColor: statusColors[n.workPlace.id - 1],
+                                                backgroundColor: statusColors[n.workPlace.id - 1 ],
                                                 color: "black",
                                                 fontWeight: "bold",
                                                 fontSize: "18px"
@@ -360,6 +352,14 @@ function SimpleTable(props) {
                                             label={`${n.workPlace ? n.workPlace.workPlaceName : "N/A"
                                                 }`}
                                         />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Typography sx={{ fontSize: "18px" }}>
+                                            {/* {n.workTime} */}
+                                            {/* {year} {month} {day} */}
+
+                                            {year}年{padTo2DigitsTime(month)}月{padTo2DigitsTime(day)}日  {padTo2DigitsTime(hours)}:{padTo2DigitsTime(minutes)}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell align="center" width={"30%"}>
                                         <Typography sx={{ fontSize: "18px" }}>
