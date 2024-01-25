@@ -247,7 +247,7 @@ function SimpleTable(props) {
             <Grid sx={{ display: "flex", justifyContent: "end" }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
-                        label="行先"
+                        label="免社時間"
                         value={selectedDate}
                         // onChange={(newValue) => setWorkTime(newValue)}
                         onChange={(newValue) => {
@@ -430,7 +430,7 @@ function SimpleTable(props) {
                                         inputFormat="dd/MM/YYYY 
                                         HH:mm"
                                         
-                                        label="行先"
+                                        label="免社時間"
                                         sx={{
                                             marginTop: "20px",
                                             width: "415px",
@@ -445,7 +445,7 @@ function SimpleTable(props) {
                             <Typography>
                                 <TextField
                                     required
-                                    label="免社時間"
+                                    label="行先"
                                     value={selectedWorkPlaceId}
                                     onChange={(e) => setSelectedWorkPlaceId(e.target.value)}
                                     select
