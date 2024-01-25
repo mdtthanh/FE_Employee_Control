@@ -10,7 +10,7 @@ export const mainListItems = (
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
-      <ListItemText primary="Dashboard" />
+      <ListItemText primary="従業員情報" />
     </ListItem>
   </div>
 );

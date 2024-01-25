@@ -1,73 +1,123 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import Chip from '@mui/material/Chip';
-import { Close } from '@material-ui/icons';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import dayjs, { Dayjs } from 'dayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import Autocomplete from '@mui/material/Autocomplete';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { DateField } from '@mui/x-date-pickers/DateField';
-import { TimeField } from '@mui/x-date-pickers/TimeField';
-import { DateTime } from 'luxon';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import Chip from "@mui/material/Chip";
+import { Close } from "@material-ui/icons";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import dayjs from "dayjs";
+import utc from 'dayjs-plugin-utc';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import Autocomplete from "@mui/material/Autocomplete";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { DateField } from "@mui/x-date-pickers/DateField";
+import { TimeField } from "@mui/x-date-pickers/TimeField";
+import { DateTime } from "luxon";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { formatToTimeZone } from "date-fns-timezone";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Grid from '@mui/material/Grid';
+dayjs.extend(utc);
 const styles = {
     root: {
-        width: '100%',
-        overflowX: 'auto',
+        width: "100%",
+        overflowX: "auto",
     },
     table: {
         minWidth: 700,
-    }
+    },
 };
 const style_modal = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 500,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     pt: 2,
     px: 4,
-    pb: 3
-}
+    pb: 3,
+};
+const statusColors = ["#7986cb", "#2196f3", "#4fc3f7", "#4dd0e1", "#4db6ac", "#81c784", "#aed581", "#fdd835", "#ffd54f", "#ffb74d", "#ff7043"];
 function SimpleTable(props) {
     const { classes } = props;
     const [data, setData] = useState([]);
     const [workPlace, setWorkPlace] = useState([]);
-    const [username, setUsername] = useState('');
-    const [workTime, setWorkTime] = useState(dayjs(''));
-    const [description, setDescription] = useState('');
+    const [username, setUsername] = useState("");
+    const [workTime, setWorkTime] = useState("");
+    const [description, setDescription] = useState("");
     const [open, setOpen] = React.useState(false);
-    const [selectedWorkPlace, setSelectedWorkPlace] = useState('');
+    const [selectedWorkPlace, setSelectedWorkPlace] = useState("");
     const [selectedWorkPlaceId, setSelectedWorkPlaceId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [idEmployee, setIdEmployee] = useState();
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+    // const [filteredData, setFilteredData] = useState(null);
+    const [matchingEmployees, setMatchingEmployees] = useState(data);
+    function padTo2Digits(num) {
+        return num.toString().padStart(2, "0");
+    }
+
+    function padTo2DigitsTime(num) {
+        return String(num).padStart(2, "0");
+    }
+
+    
+    function handleDateChange(date) {
+        const dateStr = new Date(date)
+        const day = dateStr.getDate()-1; // get the day
+        const month = dateStr.getMonth() + 1; // get the month (getMonth() returns month index starting from 0)
+        const year = dateStr.getFullYear(); // get the year
+        // Convert the selected date to a string in the format YYYY-MM-DD
+        const timeDate = `${padTo2Digits(day)}/${padTo2Digits(month)}/${year}`;
+
+        // Filter the employees whose workTime matches the selected date
+        const matchingEmployees = data.filter(employee => {
+            // Convert the employee's workTime to a date and then to a string in the format YYYY-MM-DD
+            const employeeDate = new Date(employee.workTime);
+            const formattedWorkTime = employeeDate.toLocaleDateString('en-GB', { timeZone: 'UTC' });
+            // console.log(formattedWorkTime)
+            return formattedWorkTime === timeDate;
+        });
+        setMatchingEmployees(matchingEmployees);
+        // console.log(matchingEmployees)
+        // console.log(timeDate);
+    }
+
+    const handleAddEmployeeClick = () => {
+        setIdEmployee('');
+        setUsername('');
+        setDescription('');
+        setWorkTime('');
+        setSelectedWorkPlace(null);
+        setIdEmployee('');
+        setOpen(true);
+    };
 
     const handleChange = (event, value) => {
-        const selectedPlace = workPlace.find(place => place.workPlaceName === value);
+        const selectedPlace = workPlace.find(
+            (place) => place.workPlaceName === value
+        );
         setSelectedWorkPlace(selectedPlace);
         setSelectedWorkPlaceId(selectedPlace ? selectedPlace.id : null);
-        console.log(selectedPlace ? selectedPlace.id : 'No place selected');
+        console.log(selectedPlace ? selectedPlace.id : "No place selected");
     };
     const handleUsernameChange = (event) => {
         setUsername(event.target.value);
@@ -76,7 +126,7 @@ function SimpleTable(props) {
         setDescription(event.target.value);
     };
     const handleWorkTimeChange = (event) => {
-        console.log(workPlace)
+        console.log(workPlace);
         setWorkTime(event.target.value);
     };
     const handleWorkplaceChange = (event, value) => {
@@ -84,53 +134,52 @@ function SimpleTable(props) {
         // setSelectedWorkPlace(selectedPlace);
         // setSelectedWorkPlaceId(selectedPlace ? selectedPlace.id : null);
         // setSelectedWorkPlace(event.target.value);
-        // console.log(value)   
-    }
+        // console.log(value)
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
         // const data = new FormData(event.target);
         const info = JSON.stringify({
-            "username": username,
-            "workPlaceId": selectedWorkPlaceId,
-            "description": description,
-            // "workTime": workTime
-        })
-        fetch('http://localhost:5006/api/User/AddAllInfo', {
-            method: 'POST',
+            username: username,
+            workPlaceId: selectedWorkPlaceId,
+            description: description,
+            workTime: workTime
+        });
+        fetch("http://localhost:5006/api/User/AddAllInfo", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
             body: info,
         })
-            .then(response => response.json())
-            .then(data => {
-                setData(prevData => [...prevData, data]);
-                window.location.reload()
+            .then((response) => response.json())
+            .then((data) => {
+                setData((prevData) => [...prevData, data]);
+                window.location.reload();
                 setOpen(false);
-
             })
-            .catch((error) => console.error('Error:', error));
+            .catch((error) => console.error("Error:", error));
     };
 
     const handleShowInfoEmployee = (id) => {
         fetch(`http://localhost:5006/api/User/AllInfo/${id}`)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 // Set the state with the fetched data
                 setUsername(data.username);
                 setSelectedWorkPlaceId(data.workPlaceId);
                 setDescription(data.description);
-                setSelectedWorkPlace(data.workPlace.workPlaceName)
+                setSelectedWorkPlace(data.workPlace.workPlaceName);
                 setIdEmployee(data.id);
                 setWorkTime(data.workTime);
 
                 // Open the edit dialog
                 setOpen(true);
-                console.log(data.workTime)
+                console.log(data.workTime);
                 // console.log(data)
             })
-            .catch((error) => console.error('Error:', error));
+            .catch((error) => console.error("Error:", error));
     };
 
     const handleEdit = (id) => {
@@ -138,113 +187,193 @@ function SimpleTable(props) {
         myHeaders.append("Content-Type", "application/json");
 
         var raw = JSON.stringify({
-            "username": username,
-            "workPlaceId": selectedWorkPlaceId,
-            "description": description,
-            "workTime": workTime
+            username: username,
+            workPlaceId: selectedWorkPlaceId,
+            description: description,
+            workTime: workTime,
         });
 
         var requestOptions = {
-            method: 'PUT',
+            method: "PUT",
             headers: myHeaders,
             body: raw,
-            redirect: 'follow'
+            redirect: "follow",
         };
         fetch(`http://localhost:5006/api/User/EditInfo/${id}`, requestOptions)
-            .then(response => response.json())
-            .then(result => {
+            .then((response) => response.json())
+            .then((result) => {
                 setOpen(false);
-                window.location.reload()
-                console.log(result)
+                window.location.reload();
+                console.log(result);
             })
-            .catch(error => console.log('error', error));
-    }
+            .catch((error) => console.log("error", error));
+    };
     const handleDelete = (id) => {
         fetch(`http://localhost:5006/api/User/DeleteInfo/${id}`, {
-            method: 'DELETE',
+            method: "DELETE",
         })
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 console.log(data);
                 // Remove the deleted item from the state
-                setData(prevData => prevData.filter(item => item.id !== id));
+                setData((prevData) => prevData.filter((item) => item.id !== id));
             })
-            .catch((error) => console.error('Error:', error));
+            .catch((error) => console.error("Error:", error));
     };
     useEffect(() => {
-        fetch('http://localhost:5006/api/User/AllInfo')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setData(data)
+        setMatchingEmployees(data);
+    }, [data]);
+    useEffect(() => {
+        fetch("http://localhost:5006/api/User/AllInfo")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setData(data);
             })
-            .catch(error => console.error('Error:', error));
-    }, [])
+            .catch((error) => console.error("Error:", error));
+    }, []);
 
     useEffect(() => {
-        fetch('http://localhost:5006/api/User/AllInfoWorkPlace')
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setWorkPlace(data)
+        fetch("http://localhost:5006/api/User/AllInfoWorkPlace")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setWorkPlace(data);
             })
-            .catch(error => console.error('Error:', error));
-    }, [])
-
+            .catch((error) => console.error("Error:", error));
+    }, []);
     return (
         <>
-            <Button
-                variant="contained"
-                sx={{
-                    float: 'right',
-                    marginBottom: '20px',
-                }}
-                onClick={handleOpen}
-            >+ Add Employee</Button>
+            <Grid sx={{ display: "flex", justifyContent: "end" }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        label="行先"
+                        value={selectedDate}
+                        // onChange={(newValue) => setWorkTime(newValue)}
+                        onChange={(newValue) => {
+                            // const formattedDate = dayjs(newValue).format('DD:MM:YYYY');
+                            setSelectedDate(newValue);
+                            // console.log(newValue);
+                            handleDateChange(newValue);
+                        }}
+
+                    />
+                </LocalizationProvider>
+
+                <Button
+                    variant="contained"
+                    sx={{
+                        float: "right",
+                        marginBottom: "20px",
+                        height: "55px",
+                        marginLeft: "20px",
+                    }}
+                    onClick={handleAddEmployeeClick}
+                >
+                    従業員を追加
+                </Button>
+            </Grid>
 
             <Paper className={classes.root}>
                 <Table className={classes.table}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>順番</TableCell>
-                            <TableCell align="left">User Name</TableCell>
-                            <TableCell align="left">Work Time</TableCell>
-                            <TableCell align="center">Location</TableCell>
-                            <TableCell align="left">Description</TableCell>
-                            <TableCell align="center">Actions</TableCell>
+                            <TableCell>
+                                <Typography
+                                    sx={{
+                                        fontSize: "20px",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    順番
+                                </Typography>
+                            </TableCell>
+                            <TableCell width={"20%"} align="center">
+                                <Typography
+                                    sx={{
+                                        fontSize: "20px",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    氏名
+                                </Typography>
+                            </TableCell>
+                            <TableCell align="center">
+                                <Typography sx={{ fontSize: "20px", fontWeight: "bold" }}>
+                                    行先
+                                </Typography>
+                            </TableCell>
+                            <TableCell align="center">
+                                <Typography sx={{ fontSize: "20px", fontWeight: "bold" }}>
+                                    免社時間
+                                </Typography>
+                            </TableCell>
+                            <TableCell align="center" width={"30%"}>
+                                <Typography sx={{ fontSize: "20px", fontWeight: "bold" }}>
+                                    備考
+                                </Typography>
+                            </TableCell>
+                            <TableCell align="left">
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data.map((n, index) => {
+                        {matchingEmployees.map((n, index) => {
+                            matchingEmployees.sort((a, b) => new Date(b.workTime) - new Date(a.workTime));
                             // Convert workTime to a Date object
                             const date = new Date(n.workTime);
-                            // Format the hours and minutes
-                            const hours = date.getHours();
-                            const minutes = date.getMinutes();
-                            const formattedWorkTime = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+                            const day = date.getUTCDate();
+                            const month = date.getUTCMonth() + 1;
+                            const year = date.getUTCFullYear();
+                            const hours = date.getUTCHours();
+                            const minutes = date.getUTCMinutes();
 
                             return (
                                 <TableRow key={n.id}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell component="th" align="left" scope="row">
-                                        {n.username}
+                                    <TableCell>
+                                        <Typography sx={{ fontSize: "18px" }}>
+                                            {index + 1}
+                                        </Typography>
                                     </TableCell>
-                                    <TableCell align="left">{formattedWorkTime}</TableCell>
+                                    <TableCell width={"20%"} component="th" align="center" scope="row">
+                                        <Typography sx={{ fontSize: "18px" }}>
+                                            {n.username}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Typography sx={{ fontSize: "18px" }}>
+                                            {/* {n.workTime} */}
+                                            {/* {year} {month} {day} */}
+
+                                            {year}年{padTo2DigitsTime(month)}月{padTo2DigitsTime(day)}  {padTo2DigitsTime(hours)}:{padTo2DigitsTime(minutes)}
+                                        </Typography>
+                                    </TableCell>
                                     <TableCell align="center">
                                         <Chip
-                                            sx={{ "width": "100px" }}
-                                            label={`${n.workPlace ? n.workPlace.workPlaceName : 'N/A'}`}
-                                            color="success" />
+                                            sx={{
+                                                width: "100px",
+                                                backgroundColor: statusColors[n.workPlace.id - 1],
+                                                color: "black",
+                                                fontWeight: "bold",
+                                                fontSize: "18px"
+                                            }}
+                                            label={`${n.workPlace ? n.workPlace.workPlaceName : "N/A"
+                                                }`}
+                                        />
                                     </TableCell>
-                                    <TableCell align="left">{n.description}</TableCell>
+                                    <TableCell align="center" width={"30%"}>
+                                        <Typography sx={{ fontSize: "18px" }}>
+                                            {n.description}
+                                        </Typography>
+                                    </TableCell>
                                     <TableCell align="center">
                                         <EditIcon
                                             onClick={() => handleShowInfoEmployee(n.id)}
-                                            className='button_edit'
-                                            sx={{ "cursor": "pointer", ":hover": { color: "blue" } }}
+                                            className="button_edit"
+                                            sx={{ cursor: "pointer", ":hover": { color: "blue" } }}
                                         />
                                         <DeleteIcon
-                                            sx={{ "cursor": "pointer", ":hover": { color: "red" } }}
+                                            sx={{ cursor: "pointer", ":hover": { color: "red" } }}
                                             onClick={() => handleDelete(n.id)}
                                         />
                                     </TableCell>
@@ -264,30 +393,31 @@ function SimpleTable(props) {
                     <Button
                         onClick={handleClose}
                         sx={{
-                            "float": "right",
+                            float: "right",
                         }}
                     >
                         <Close />
                     </Button>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Employee Information
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ fontWeight: "bold" }}>
+                        従業員情報
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 3 }}>
                         <Box
                             component="form"
                             sx={{
-                                '& > :not(style)': { m: 1, width: '25ch' },
+                                "& > :not(style)": { m: 1, width: "25ch" },
                             }}
                             noValidate
                             autoComplete="off"
                         >
                             <Typography>
                                 <TextField
+                                    required
                                     id="outlined-basic"
-                                    label="Username"
+                                    label="氏名"
                                     variant="outlined"
                                     sx={{
-                                        "width": "415px"
+                                        width: "415px",
                                     }}
                                     value={username}
                                     onChange={handleUsernameChange}
@@ -296,71 +426,78 @@ function SimpleTable(props) {
                             <Typography>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DateTimePicker
-                                        label="Controlled picker"
+                                        required
+                                        inputFormat="dd/MM/YYYY 
+                                        HH:mm"
+                                        
+                                        label="行先"
                                         sx={{
-                                            "marginTop": "20px",
-                                            "width": "415px"
+                                            marginTop: "20px",
+                                            width: "415px",
                                         }}
                                         value={dayjs(workTime)}
-                                        onChange={(selectedDate) => setWorkTime(selectedDate)}
+                                        onChange={(selectedDate) => {
+                                            setWorkTime(selectedDate);
+                                        }}
                                     />
                                 </LocalizationProvider>
                             </Typography>
-                            <Typography >
+                            <Typography>
                                 <TextField
-                                    label="Location"
+                                    required
+                                    label="免社時間"
                                     value={selectedWorkPlaceId}
                                     onChange={(e) => setSelectedWorkPlaceId(e.target.value)}
                                     select
                                     sx={{
-                                        "marginTop": "20px",
-                                        "width": "415px"
+                                        marginTop: "20px",
+                                        width: "415px",
                                     }}
                                 >
                                     {workPlace.map((place) => (
-                                        <MenuItem value={place.id}>
-                                            {place.workPlaceName}
-                                        </MenuItem>
+                                        <MenuItem value={place.id}>{place.workPlaceName}</MenuItem>
                                     ))}
                                 </TextField>
                             </Typography>
                             <Typography>
                                 <TextField
                                     id="outlined-basic"
-                                    label="Description"
+                                    label="備考"
                                     variant="outlined"
                                     sx={{
-                                        "marginTop": "20px",
-                                        "width": "415px"
+                                        marginTop: "20px",
+                                        width: "415px",
                                     }}
                                     value={description}
                                     onChange={handleDescriptionChange}
                                 />
                             </Typography>
-
                         </Box>
                         <Box
                             sx={{
-                                marginTop: '30px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                width: '415px'
+                                marginTop: "30px",
+                                display: "flex",
+                                justifyContent: "center",
+                                width: "415px",
                             }}
                         >
                             <Button
                                 variant="outlined"
                                 color="success"
                                 sx={{
-                                    marginRight: '10px'
+                                    marginRight: "10px",
                                 }}
-                                onClick={() => handleEdit(idEmployee)}
+                                onClick={(e) =>
+                                    idEmployee ? handleEdit(idEmployee) : handleSubmit(e)
+                                }
                             >
-                                Save
+                                保存
                             </Button>
-                            <Button onClick={handleClose} variant="outlined" color="error">Cancel</Button>
+                            <Button onClick={handleClose} variant="outlined" color="error">
+                                キャンセル
+                            </Button>
                         </Box>
                     </Typography>
-
                 </Box>
             </Modal>
         </>

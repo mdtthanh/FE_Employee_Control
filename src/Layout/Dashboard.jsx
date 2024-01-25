@@ -137,7 +137,7 @@ class Dashboard extends React.Component {
               noWrap
               className={classes.title}
             >
-              Dashboard
+              従業員管理
             </Typography>
             <IconButton color="inherit">
             </IconButton>
@@ -162,7 +162,7 @@ class Dashboard extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Typography variant="h4" gutterBottom component="h2">
-            Employee
+          行勤予定表
           </Typography>
           <div className={classes.tableContainer}>
             <SimpleTable />
