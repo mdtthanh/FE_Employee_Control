@@ -64,7 +64,7 @@ function SimpleTable(props) {
     const [idEmployee, setIdEmployee] = useState();
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [selectedDate, setSelectedDate] = useState(new Date('2024-01-01'));
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentDate, setCurrentDate] = useState(new Date());
     // const [filteredData, setFilteredData] = useState(null);
     const [matchingEmployees, setMatchingEmployees] = useState(data);
@@ -103,6 +103,7 @@ function SimpleTable(props) {
     // // console.log(`Hôm nay là ngày ${date1} tháng ${month1} năm ${year1}`);
     //     }
 
+    console.log(selectedDate)
     const handleDateChange = (date) => {
         setSelectedDate(date);
         const dateStr = new Date(date)
@@ -269,36 +270,45 @@ function SimpleTable(props) {
     }, []);
     return (
         <>
+            <Grid alignItems="center" container spacing={2} sx={{ "display": "flex" }}>
+                <Grid item xs={4} >
 
-            <Grid sx={{ display: "flex", justifyContent: "end" }}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="帰社時間"
-                        // value={dayjs(currentDate)}
-                        format="YYYY/MM/DD"
-                        onChange={(newValue) => {
-                            // const formattedDate = dayjs(newValue).format('DD:MM:YYYY');
-                            setSelectedDate(newValue);
-                            // console.log(newValue);
-                            handleDateChange(newValue);
+                </Grid>
+                <Grid item xs={4} sx={{"fontSize": "20px", "fontWeight": "Bold"}}>
+                    {dayjs(selectedDate).format('YYYY年MM月DD日')}
+                </Grid>
+                <Grid item xs={4} >
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="帰社時間"
+                            // value={dayjs(currentDate)}
+                            format="YYYY/MM/DD"
+                            onChange={(newValue) => {
+                                // const formattedDate = dayjs(newValue).format('DD:MM:YYYY');
+                                setSelectedDate(newValue);
+                                // console.log(newValue);
+                                handleDateChange(newValue);
+                            }}
+
+                        />
+                    </LocalizationProvider>
+
+                    <Button
+                        variant="contained"
+                        sx={{
+                            float: "right",
+                            marginBottom: "20px",
+                            height: "55px",
+                            // marginLeft: "20px",
                         }}
+                        onClick={handleAddEmployeeClick}
+                    >
+                        勤務追加
+                    </Button>
+                </Grid>
 
-                    />
-                </LocalizationProvider>
-
-                <Button
-                    variant="contained"
-                    sx={{
-                        float: "right",
-                        marginBottom: "20px",
-                        height: "55px",
-                        marginLeft: "20px",
-                    }}
-                    onClick={handleAddEmployeeClick}
-                >
-                    勤務追加
-                </Button>
             </Grid>
+
 
             <Paper className={classes.root}>
                 <Table className={classes.table}>
