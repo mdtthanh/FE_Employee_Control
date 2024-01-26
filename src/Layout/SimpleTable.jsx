@@ -270,7 +270,7 @@ function SimpleTable(props) {
                     }}
                     onClick={handleAddEmployeeClick}
                 >
-                    従業員を追加
+                    勤務追加
                 </Button>
             </Grid>
 
