@@ -274,10 +274,8 @@ function SimpleTable(props) {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                         label="帰社時間"
-                        value={dayjs(currentDate)}
+                        // value={dayjs(currentDate)}
                         format="YYYY/MM/DD"
-                        // defaultValue={dayjs(currentDate)}
-                        // onChange={(newValue) => setWorkTime(newValue)}
                         onChange={(newValue) => {
                             // const formattedDate = dayjs(newValue).format('DD:MM:YYYY');
                             setSelectedDate(newValue);
