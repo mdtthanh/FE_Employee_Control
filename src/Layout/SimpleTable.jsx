@@ -268,6 +268,7 @@ function SimpleTable(props) {
             })
             .catch((error) => console.error("Error:", error));
     }, []);
+    
     return (
         <>
             <Grid alignItems="center" container spacing={2} sx={{ "display": "flex" }}>
