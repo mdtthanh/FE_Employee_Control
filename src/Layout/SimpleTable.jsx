@@ -103,6 +103,10 @@ function SimpleTable(props) {
     // // console.log(`Hôm nay là ngày ${date1} tháng ${month1} năm ${year1}`);
     //     }
 
+    const delay = ms => new Promise(
+        resolve => setTimeout(resolve, ms)
+    );
+
     console.log(selectedDate)
     const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -155,8 +159,10 @@ function SimpleTable(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        // const randomId = Math.floor(Math.random() * 90000) + 10000; // This will generate a random number between 10000 and 99999
         // const data = new FormData(event.target);
         const info = JSON.stringify({
+            // id: Math.floor(Math.random() * 90000),
             username: username,
             workPlaceId: selectedWorkPlaceId,
             description: description,
@@ -171,9 +177,13 @@ function SimpleTable(props) {
         })
             .then((response) => response.json())
             .then((data) => {
+                // await delay(2000);
+
                 setData((prevData) => [...prevData, data]);
-                window.location.reload();
+                // window.location.reload();
+                console.log(data)
                 setOpen(false);
+
             })
             .catch((error) => console.error("Error:", error));
     };
@@ -183,11 +193,11 @@ function SimpleTable(props) {
             .then((response) => response.json())
             .then((data) => {
                 // Set the state with the fetched data
+                setIdEmployee(data.id);
                 setUsername(data.username);
                 setSelectedWorkPlaceId(data.workPlaceId);
                 setDescription(data.description);
                 setSelectedWorkPlace(data.workPlace.workPlaceName);
-                setIdEmployee(data.id);
                 setWorkTime(data.workTime);
 
                 // Open the edit dialog
@@ -201,25 +211,27 @@ function SimpleTable(props) {
     const handleEdit = (id) => {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-
+    
         var raw = JSON.stringify({
             username: username,
             workPlaceId: selectedWorkPlaceId,
             description: description,
             workTime: workTime,
         });
-
+    
         var requestOptions = {
             method: "PUT",
             headers: myHeaders,
             body: raw,
             redirect: "follow",
         };
+        
         fetch(`http://localhost:5006/api/User/EditInfo/${id}`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
                 setOpen(false);
-                window.location.reload();
+                // Update the state with the edited user
+                setData(data.map(user => user.id === id ? result : user));
                 console.log(result);
             })
             .catch((error) => console.log("error", error));
@@ -268,14 +280,14 @@ function SimpleTable(props) {
             })
             .catch((error) => console.error("Error:", error));
     }, []);
-    
+
     return (
         <>
             <Grid alignItems="center" container spacing={2} sx={{ "display": "flex" }}>
                 <Grid item xs={4} >
 
                 </Grid>
-                <Grid item xs={4} sx={{"fontSize": "20px", "fontWeight": "Bold"}}>
+                <Grid item xs={4} sx={{ "fontSize": "20px", "fontWeight": "Bold" }}>
                     {dayjs(selectedDate).format('YYYY年MM月DD日')}
                 </Grid>
                 <Grid item xs={4} >
@@ -381,13 +393,12 @@ function SimpleTable(props) {
                                         <Chip
                                             sx={{
                                                 width: "100px",
-                                                backgroundColor: statusColors[n.workPlace.id - 1],
+                                                backgroundColor: statusColors[n.workPlaceId - 1],
                                                 color: "black",
                                                 fontWeight: "bold",
                                                 fontSize: "18px"
                                             }}
-                                            label={`${n.workPlace ? n.workPlace.workPlaceName : "N/A"
-                                                }`}
+                                            label={`${n.workPlaceId ? (workPlace.find(wp => wp.id === n.workPlaceId)?.workPlaceName || "N/A") : "N/A"}`}
                                         />
                                     </TableCell>
                                     <TableCell align="center">
