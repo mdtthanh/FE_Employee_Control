@@ -161,6 +161,10 @@ function SimpleTable(props) {
         event.preventDefault();
         // const randomId = Math.floor(Math.random() * 90000) + 10000; // This will generate a random number between 10000 and 99999
         // const data = new FormData(event.target);
+        if (!username || !selectedWorkPlaceId || !workTime) {
+            alert("詳細な情報を入力してください。");
+            return;
+        }
         const info = JSON.stringify({
             // id: Math.floor(Math.random() * 90000),
             username: username,
@@ -212,6 +216,11 @@ function SimpleTable(props) {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
     
+        if (!username || !selectedWorkPlaceId || !workTime) {
+            alert("詳細な情報を入力してください。");
+            return;
+        }
+        
         var raw = JSON.stringify({
             username: username,
             workPlaceId: selectedWorkPlaceId,
@@ -368,7 +377,7 @@ function SimpleTable(props) {
                     </TableHead>
                     <TableBody>
                         {matchingEmployees.map((n, index) => {
-                            matchingEmployees.sort((a, b) => new Date(b.workTime) - new Date(a.workTime));
+                            matchingEmployees.sort((a, b) => new Date(a.workTime) - new Date(b.workTime));
                             // Convert workTime to a Date object
                             const date = new Date(n.workTime);
                             const day = date.getUTCDate();
@@ -406,7 +415,8 @@ function SimpleTable(props) {
                                             {/* {n.workTime} */}
                                             {/* {year} {month} {day} */}
 
-                                            {year}年{padTo2DigitsTime(month)}月{padTo2DigitsTime(day)}日  {padTo2DigitsTime(hours)}:{padTo2DigitsTime(minutes)}
+                                            {/* {year}年{padTo2DigitsTime(month)}月{padTo2DigitsTime(day)}日   */}
+                                            {padTo2DigitsTime(hours)}:{padTo2DigitsTime(minutes)}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="center" width={"30%"}>
